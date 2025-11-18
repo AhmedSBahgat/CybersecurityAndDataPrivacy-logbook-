@@ -120,8 +120,3 @@ The automated ZAP scan identified multiple high-risk security issues, including 
 
 **8. User-Agent Fuzzer Results**  
 - **Impact:** No direct vulnerabilities; purely informational  
-
----
-
-**Notes:**  
-This report should guide immediate remediation efforts to secure the registration functionality and improve server hardening.
