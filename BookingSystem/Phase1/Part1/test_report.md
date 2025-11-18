@@ -75,10 +75,8 @@ Automated ZAP scan identified multiple vulnerabilities in the registration flow,
 
 # 5️⃣ OWASP ZAP Test Report (Attachment)
 
-**Purpose:**  
-- Attach or link your OWASP ZAP scan results (Markdown format preferred).
 
 **Link / Attachment:**  
-- [[ZAP Scan Results - Round 1](#)  ](https://github.com/AhmedSBahgat/CybersecurityAndDataPrivacy-logbook-/blob/main/BookingSystem/Phase1/Part1/zap_report_round1.md)
+(https://github.com/AhmedSBahgat/CybersecurityAndDataPrivacy-logbook-/blob/main/BookingSystem/Phase1/Part1/zap_report_round1.md)
 
 
