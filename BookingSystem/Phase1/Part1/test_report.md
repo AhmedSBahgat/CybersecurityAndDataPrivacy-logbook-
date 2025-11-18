@@ -36,7 +36,7 @@
 
 # 2️⃣ Executive Summary
 
-**Short summary (1-2 sentences):**  
+**Short summary:**  
 Automated ZAP scan identified multiple vulnerabilities in the registration flow, including SQL Injection, Path Traversal, and missing security headers.
 
 **Overall risk level:** High 🔴
