@@ -1,18 +1,19 @@
 Penetration Test Report
 
-(Based on ZAP by Checkmarx results)
+Based on ZAP (Checkmarx) results
 
 1️⃣ Introduction
+
 Testers:
 
-Name: Ahmed Bahgat, Md Hosen
+Ahmed Bahgat
+
+Md Hosen
 
 Purpose:
+The goal of this penetration test is to identify security vulnerabilities in the application’s registration flow, HTTP security headers, and input validation using automated scanning (ZAP) and manual verification.
 
-Identify security vulnerabilities in the application’s registration flow, HTTP security headers, and input validation, using automated scanning (ZAP) and manual verification.
-
-Scope
-
+Scope:
 Tested components:
 
 GET /
@@ -25,123 +26,121 @@ Static files under /static/*
 
 Exclusions:
 
-No authentication-based areas
+No authentication-required areas
 
 No admin panels
 
 No backend infrastructure or cloud configuration
 
-Test approach:
-Gray‑box
+Test Approach:
+Gray-box testing
 
-Test environment & dates
+Environment & Dates:
 
 Start: 14/11/2025
+
 End: 17/11/2025
 
-Environment details:
-OS: Kali (Dockerized app)
-Browsers: Firefox, (ZAP internal engine)
+Environment Details:
 
-Only accessible local instance (http://localhost:8000)
+OS: Kali (Dockerized app)
+
+Browsers: Firefox, ZAP internal engine
+
+Application URL: http://localhost:8000 (local instance only)
 
 2️⃣ Executive Summary
-Short summary:
 
-The automated ZAP scan discovered several high‑risk issues including SQL Injection and Path Traversal, along with missing security headers and CSRF protections.
+The automated ZAP scan identified multiple high-risk security issues, including SQL Injection and Path Traversal, along with missing security headers and absent CSRF protection.
 
-Overall risk level:
+Overall Risk Level: 🔴 High
 
-🔴 High
+Top 5 Immediate Actions:
 
-Top 5 immediate actions
-
-Implement parameterized SQL queries to eliminate SQL Injection.
+Implement parameterized SQL queries to prevent SQL Injection.
 
 Enforce strict path handling & canonicalization to prevent Path Traversal.
 
 Add CSRF tokens to all POST forms.
 
-Configure essential security headers (CSP, X‑Frame‑Options, X‑Content‑Type‑Options).
+Configure essential security headers (CSP, X-Frame-Options, X-Content-Type-Options).
 
-Validate and sanitize all input fields server‑side.
+Validate and sanitize all input fields on the server side.
 
-3️⃣ Severity scale & definitions
-Severity Level	Description	Recommended Action
-🔴 High	Serious vulnerability (SQLi, RCE, Path Traversal) enabling system compromise	Fix immediately
-🟠 Medium	Significant issue requiring some conditions (XSS, CSRF, header missing)	Fix ASAP
-🟡 Low	Minor weakness or info disclosure	Fix soon
-🔵 Info	No direct risk; useful for hardening	Monitor
+3️⃣ Severity Scale & Definitions
+Severity	Description	Recommended Action
+🔴 High	Critical vulnerability (SQLi, RCE, Path Traversal) enabling system compromise	Fix immediately
+🟠 Medium	Significant issue requiring specific conditions (XSS, CSRF, missing headers)	Fix ASAP
+🟡 Low	Minor weakness or information disclosure	Fix soon
+🔵 Info	No direct risk; useful for system hardening	Monitor
 4️⃣ Key Findings Summary (Top 5)
-
-(Extracted from ZAP alerts)
-
 ID	Severity	Finding	Description	Evidence
-F‑01	🔴 High	SQL Injection	username parameter in POST /register triggers DB errors and Boolean-based SQLi	500 Internal Server Error + manipulated boolean tests
-F‑02	🔴 High	Path Traversal	username parameter accepts traversal-like payloads allowing unsafe file access attempts	ZAP Path Traversal payloads triggered
-F‑03	🟠 Medium	Absence of Anti‑CSRF tokens	/register POST form has no CSRF protection	<form method="POST"> without token
-F‑04	🟠 Medium	Missing essential security headers	Missing CSP, X‑Frame‑Options, X‑Content-Type-Options	ZAP header checks
-F‑05	🟠 Medium	Format string vulnerability	%s/%n payload causes abnormal termination	“Potential Format String Error” from ZAP
-Detailed Findings (Full ZAP Breakdown)
+F-01	🔴 High	SQL Injection	username parameter in POST /register triggers DB errors and Boolean-based SQLi	500 Internal Server Error + Boolean tests
+F-02	🔴 High	Path Traversal	username parameter accepts traversal payloads, allowing unsafe file access attempts	ZAP Path Traversal payloads triggered
+F-03	🟠 Medium	No Anti-CSRF tokens	/register POST form has no CSRF protection	<form method="POST"> without token
+F-04	🟠 Medium	Missing essential security headers	CSP, X-Frame-Options, X-Content-Type-Options missing	ZAP header checks
+F-05	🟠 Medium	Format string vulnerability	Payloads with %s/%n cause abnormal termination	“Potential Format String Error” from ZAP
+5️⃣ Detailed Findings
+High-Risk Findings
 
-Below is a compact, professional summary of the ZAP results you posted.
+1. SQL Injection
 
-High Risk Findings
-1. Path Traversal (High)
-
-Endpoints: POST /register
+Endpoint: POST /register
 
 Parameter: username
 
-Impact: Possible access to server files outside intended scope.
+Impact: Database manipulation, data leakage, or full database compromise
 
-Evidence: ZAP detected traversal payload acceptance.
+Evidence: Server returned 500 Internal Server Error for ' and Boolean SQLi test (AND 1=1 vs AND 1=2)
 
-2. SQL Injection (High)
+2. Path Traversal
 
-Endpoints: POST /register
+Endpoint: POST /register
 
 Parameter: username
 
-Impact: Database manipulation, data leakage, or full DB compromise.
+Impact: Access to files outside intended scope
 
-Evidence:
+Evidence: ZAP detected acceptance of traversal-like payloads
 
-Server returned 500 Internal Server Error on '
+Medium-Risk Findings
 
-Boolean SQLi successful (AND 1=1 vs AND 1=2)
+3. No Anti-CSRF Tokens
 
-Medium Risk Findings
-3. No Anti‑CSRF Tokens
+Affected Endpoint: /register
 
-Form lacks server-generated CSRF tokens.
+Impact: Potential CSRF attacks
 
-Affects: /register
+Evidence: POST form lacks server-generated token
 
 4. Missing Content-Security-Policy (CSP)
 
-Allows XSS, injection attacks.
+Affected Endpoints: / and /register
 
-Affects: / and /register
+Impact: Increases risk of XSS and injection attacks
 
-5. Format String Error
+5. Format String Vulnerability
 
-Payloads with %s, %n cause abnormal behavior.
+Affected Endpoint: POST /register
 
-Indicates unsafe server-side string formatting.
+Impact: Server-side string formatting issues, possible abnormal termination
 
-6. Missing Anti-clickjacking Header
+Evidence: %s / %n payloads trigger unexpected behavior
 
-No X-Frame-Options or frame-ancestors header.
+6. Missing Anti-Clickjacking Header
 
-Low Risk Findings
+Evidence: No X-Frame-Options or frame-ancestors headers detected
+
+Low-Risk Findings
+
 7. X-Content-Type-Options Missing
 
-Affects /, /register, and static assets
+Affected Endpoints: /, /register, and static assets
 
-Allows MIME-sniffing attacks.
+Impact: Allows MIME-sniffing attacks
 
-Informational
+Informational Findings
+
 8. User-Agent Fuzzer Results
 
-No clear vulnerabilities; informational only.
+Impact: No direct vulnerabilities; purely informational
