@@ -1,122 +1,84 @@
-# Penetration Test Report
-**Based on ZAP (Checkmarx) results**
+# 1️⃣ Introduction
 
----
-
-## 1️⃣ Introduction
-
-**Testers:**  
+**Tester(s):**  
 - Ahmed Bahgat  
 - Md Hosen  
 
 **Purpose:**  
-Identify security vulnerabilities in the application’s registration flow, HTTP security headers, and input validation using automated scanning (ZAP) and manual verification.
+- Identify security vulnerabilities in the registration flow, input validation, and HTTP security headers using ZAP and manual verification.
 
 **Scope:**  
-**Tested components:**  
-- `GET /`  
-- `GET /register`  
-- `POST /register`  
-- Static files under `/static/*`  
+- **Tested components:**  
+  - `GET /`  
+  - `GET /register`  
+  - `POST /register`  
+  - Static files under `/static/*`  
+- **Exclusions:**  
+  - No authentication-required areas  
+  - No admin panels  
+  - No backend infrastructure or cloud configuration  
+- **Test approach:** Gray-box
 
-**Exclusions:**  
-- No authentication-required areas  
-- No admin panels  
-- No backend infrastructure or cloud configuration  
-
-**Test Approach:**  
-Gray-box testing  
-
-**Environment & Dates:**  
+**Test environment & dates:**  
 - **Start:** 14/11/2025  
 - **End:** 17/11/2025  
-- **Environment Details:**  
+- **Environment details:**  
   - OS: Kali (Dockerized app)  
   - Browsers: Firefox, ZAP internal engine  
-  - Application URL: `http://localhost:8000` (local instance only)  
+  - Application URL: `http://localhost:8000`
+
+**Assumptions & constraints:**  
+- Credentials provided for testing registration  
+- Limited to local instance only  
+- Limited time window (14–17 Nov 2025)
 
 ---
 
-## 2️⃣ Executive Summary
+# 2️⃣ Executive Summary
 
-The automated ZAP scan identified multiple high-risk security issues, including **SQL Injection** and **Path Traversal**, along with missing security headers and absent CSRF protection.  
+**Short summary (1-2 sentences):**  
+Automated ZAP scan identified multiple vulnerabilities in the registration flow, including SQL Injection, Path Traversal, and missing security headers.
 
-**Overall Risk Level:** 🔴 High  
+**Overall risk level:** High 🔴
 
-**Top 5 Immediate Actions:**  
-1. Implement parameterized SQL queries to prevent SQL Injection.  
-2. Enforce strict path handling & canonicalization to prevent Path Traversal.  
-3. Add CSRF tokens to all POST forms.  
-4. Configure essential security headers (CSP, X-Frame-Options, X-Content-Type-Options).  
-5. Validate and sanitize all input fields on the server side.  
-
----
-
-## 3️⃣ Severity Scale & Definitions
-
-| Severity | Description | Recommended Action |
-|----------|------------|------------------|
-| 🔴 High | Critical vulnerability (SQLi, RCE, Path Traversal) enabling system compromise | Fix immediately |
-| 🟠 Medium | Significant issue requiring specific conditions (XSS, CSRF, missing headers) | Fix ASAP |
-| 🟡 Low | Minor weakness or information disclosure | Fix soon |
-| 🔵 Info | No direct risk; useful for system hardening | Monitor |
+**Top 5 immediate actions:**  
+1. Implement parameterized SQL queries to prevent SQL Injection  
+2. Enforce strict path handling & canonicalization to prevent Path Traversal  
+3. Add CSRF tokens to all POST forms  
+4. Configure essential security headers (CSP, X-Frame-Options, X-Content-Type-Options)  
+5. Validate and sanitize all input fields server-side  
 
 ---
 
-## 4️⃣ Key Findings Summary (Top 5)
+# 3️⃣ Severity scale & definitions
 
-| ID | Severity | Finding | Description | Evidence |
-|----|---------|--------|-------------|---------|
-| F-01 | 🔴 High | SQL Injection | `username` parameter in `POST /register` triggers DB errors and Boolean-based SQLi | 500 Internal Server Error + Boolean tests |
-| F-02 | 🔴 High | Path Traversal | `username` parameter accepts traversal payloads, allowing unsafe file access attempts | ZAP Path Traversal payloads triggered |
-| F-03 | 🟠 Medium | No Anti-CSRF tokens | `/register` POST form has no CSRF protection | `<form method="POST">` without token |
-| F-04 | 🟠 Medium | Missing essential security headers | CSP, X-Frame-Options, X-Content-Type-Options missing | ZAP header checks |
-| F-05 | 🟠 Medium | Format string vulnerability | Payloads with `%s/%n` cause abnormal termination | “Potential Format String Error” from ZAP |
+|  **Severity Level**  | **Description**                                                                                                              | **Recommended Action**           |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| 🔴 High              | Serious vulnerability that can lead to full system compromise or data breach (e.g., SQL Injection, Path Traversal).         | *Immediate fix required*         |
+| 🟠 Medium            | Significant issue requiring specific conditions (e.g., XSS, CSRF, missing headers).                                         | *Fix ASAP*                       |
+| 🟡 Low               | Minor weakness or information disclosure (e.g., server version info).                                                        | *Fix soon*                       |
+| 🔵 Info              | No direct risk; useful for system hardening (e.g., missing security headers).                                               | *Monitor and fix in maintenance* |
 
 ---
 
-## 5️⃣ Detailed Findings
+# 4️⃣ Findings
 
-### High-Risk Findings
+| ID   | Severity | Finding                  | Description                               | Evidence / Proof |
+|------|---------|--------------------------|-------------------------------------------|-----------------|
+| F-01 | 🔴 High | SQL Injection in registration | `username` input allows DB injection      | Server 500 + Boolean test |
+| F-02 | 🔴 High | Path Traversal            | `username` input allows traversal payloads | ZAP payload triggered |
+| F-03 | 🟠 Medium | Missing CSRF tokens       | POST form `/register` has no CSRF token  | `<form method="POST">` lacks token |
+| F-04 | 🟠 Medium | Missing security headers  | CSP, X-Frame-Options, X-Content-Type-Options missing | ZAP header scan |
+| F-05 | 🟠 Medium | Format string vulnerability | `%s/%n` payload causes abnormal behavior | ZAP payload triggered |
 
-**1. SQL Injection**  
-- **Endpoint:** `POST /register`  
-- **Parameter:** `username`  
-- **Impact:** Database manipulation, data leakage, or full database compromise  
-- **Evidence:** Server returned 500 Internal Server Error for `'` and Boolean SQLi test (`AND 1=1` vs `AND 1=2`)  
+---
 
-**2. Path Traversal**  
-- **Endpoint:** `POST /register`  
-- **Parameter:** `username`  
-- **Impact:** Access to files outside intended scope  
-- **Evidence:** ZAP detected acceptance of traversal-like payloads  
+# 5️⃣ OWASP ZAP Test Report (Attachment)
 
-### Medium-Risk Findings
+**Purpose:**  
+- Attach or link your OWASP ZAP scan results (Markdown format preferred).
 
-**3. No Anti-CSRF Tokens**  
-- **Affected Endpoint:** `/register`  
-- **Impact:** Potential CSRF attacks  
-- **Evidence:** POST form lacks server-generated token  
+**Link / Attachment:**  
+- [[ZAP Scan Results - Round 1](#)  ](https://github.com/AhmedSBahgat/CybersecurityAndDataPrivacy-logbook-/blob/main/BookingSystem/Phase1/Part1/zap_report_round1.md)
 
-**4. Missing Content-Security-Policy (CSP)**  
-- **Affected Endpoints:** `/` and `/register`  
-- **Impact:** Increases risk of XSS and injection attacks  
 
-**5. Format String Vulnerability**  
-- **Affected Endpoint:** `POST /register`  
-- **Impact:** Server-side string formatting issues, possible abnormal termination  
-- **Evidence:** `%s` / `%n` payloads trigger unexpected behavior  
-
-**6. Missing Anti-Clickjacking Header**  
-- **Evidence:** No X-Frame-Options or frame-ancestors headers detected  
-
-### Low-Risk Findings
-
-**7. X-Content-Type-Options Missing**  
-- **Affected Endpoints:** `/`, `/register`, and static assets  
-- **Impact:** Allows MIME-sniffing attacks  
-
-### Informational Findings
-
-**8. User-Agent Fuzzer Results**  
-- **Impact:** No direct vulnerabilities; purely informational  
