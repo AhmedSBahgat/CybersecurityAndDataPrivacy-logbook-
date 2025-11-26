@@ -15,3 +15,5 @@
 | 16.11.2025 | 5 | BookingSystem Phase 1 Part 1 | Performed ZAP penetration testing (needed multiple attempts)|
 | 17.11.2025 | 1 | BookingSystem Phase 1 Part 1 | Generated ZAP report, filled template, uploaded to repo |
 | 22.11.2025 | 4 | BookingSystem Phase 1 Part 2 | started web app stack, Generated ZAP report, uploaded to repo |
+| 26.11.2025 | 1 | BookingSystem Phase 1 Part 2 | started web app stack, Generated ZAP report, uploaded to repo |
+
