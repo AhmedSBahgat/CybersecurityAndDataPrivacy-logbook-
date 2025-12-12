@@ -16,7 +16,7 @@
 | 17.11.2025 | 1 | BookingSystem Phase 1 Part 1 | Generated ZAP report, filled template, uploaded to repo |
 | 22.11.2025 | 5 | BookingSystem Phase 1 Part 2 | started web app stack, Generated ZAP report, uploaded to repo |
 | 26.11.2025 | 1 | BookingSystem Phase 2 | started web app stack, Generated ZAP report, uploaded to repo |
-| 27.11.2025 | 6 | BookingSystem Phase 2 | Cracking 5 passwords |
+| 27.11.2025 | 7 | BookingSystem Phase 2 | Cracking 5 passwords |
 | 27.11.2025 | 1 | BookingSystem Phase 2 | password cracking report |
 | 11.12.2025 | 7 | BookingSystem Phase 3 | Generated ZAP report round 4 and auth_test_report.md |
 | 12.12.2025 | 4 | BookingSystem Phase 4 | GDPR_checklist.md cookiepolicy.md privacypolicy.md termsofservice.md |
